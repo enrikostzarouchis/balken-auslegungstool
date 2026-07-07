@@ -83,21 +83,36 @@ st.write(f"**Maximales Biegemoment:** {M_max:.2f} Nm")
 
 st.subheader("Querschnitt & Material")
 
-col1, col2 = st.columns(2)
-with col1:
-    b = st.number_input("Breite b [m]", value=0.05)
-with col2:
-    h = st.number_input("Höhe h [m]", value=0.1)
+ipe_profile = {
+    "IPE 100": {"W": 34.2e-6},
+    "IPE 120": {"W": 53.0e-6},
+    "IPE 140": {"W": 77.3e-6},
+    "IPE 160": {"W": 123.0e-6},
+    "IPE 180": {"W": 166.0e-6},
+    "IPE 200": {"W": 194.0e-6},
+    "IPE 220": {"W": 252.0e-6},
+    "IPE 240": {"W": 324.0e-6},
+    "IPE 300": {"W": 557.0e-6},
+}
 
+profil_wahl = st.selectbox("Querschnitt", ["Eigener Querschnitt","IPE 100", "IPE 120", "IPE 140", "IPE 160", "IPE 180", "IPE 200", "IPE 220", "IPE 240", "IPE 300"])
 material = st.selectbox("Material", ["S235", "S355", "Alu"])
 
+if profil_wahl == "Eigener Querschnitt":
+    col1, col2 = st.columns(2)
+    with col1:
+        b = st.number_input("Breite b [m]", value=0.05)
+    with col2:
+        h = st.number_input("Höhe h [m]", value=0.1)
+    W = (b * h**2) / 6
+else: 
+    W = ipe_profile[profil_wahl]["W"]
 werkstoffe = {
     "S235": 235e6,
     "S355": 355e6,
     "Alu":  270e6
 }
 
-W = (b * h**2) / 6
 sigma = M_max / W
 Re = werkstoffe[material]
 S = Re / sigma
