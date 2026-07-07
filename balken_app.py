@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 st.title("🔧 Balken-Auslegungstool")
 
 # Eingabefelder
-lastfall = st.selectbox("Lastfall", ["Streckenlast", "Einzellast", "Kragarm Streckenlast", "Kragarm Einzellast", "Einzellast beliebige Position"])
+lastfall = st.selectbox("Lastfall", ["Streckenlast", "Einzellast", "Kragarm Streckenlast", "Kragarm Einzellast", "Einzellast beliebige Position", "Kombination Streckenlast + Einzellast Mitte"])
 L = st.number_input("Balkenlänge L [m]", value=5.0)
 
 
@@ -24,6 +24,10 @@ elif lastfall == "Einzellast beliebige Position":
     F = st.number_input("Einzellast F [N]", value=50000.0)
     a = a = st.slider("Position der Last [m]", min_value=0.01, max_value=L-0.01, value=L/2)
     q = 0
+elif lastfall == "Kombination Streckenlast + Einzellast Mitte":
+    q = st.number_input("Streckenlast q [N/m]", value=10000.0)
+    F = st.number_input("Einzellast F [N]", value=50000.0)
+    a = 0
 else:
     F = st.number_input("Einzellast F [N]", value=50000.0)
     q = 0
@@ -56,6 +60,16 @@ elif lastfall == "Einzellast beliebige Position":
     Q = np.where(x <= a, A, -B)
     M_max = F*a*(L-a) /L
     titel = f"Einzellast beliebige Position (F={F} N, L={L} m)"
+    
+elif lastfall == "Kombination Streckenlast + Einzellast Mitte":
+    M_strecke = (q * x / 2) * (L - x)
+    M_einzel = np.where(x <= L/2, (F/2) * x, (F/2) * (L - x))
+    M = M_strecke + M_einzel
+    Q_strecke = (q / 2) * (L - 2 * x)
+    Q_einzel = np.where(x <= L/2, F/2, -F/2)
+    Q = Q_strecke + Q_einzel
+    M_max = np.max(M)
+    titel = f"Kombination (q={q} N/m, F={F} N, L={L} m)"
 
 else:
     M = np.where(x <= L/2, (F/2) * x, (F/2) * (L - x))
