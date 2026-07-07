@@ -84,15 +84,15 @@ st.write(f"**Maximales Biegemoment:** {M_max:.2f} Nm")
 st.subheader("Querschnitt & Material")
 
 ipe_profile = {
-    "IPE 100": {"W": 34.2e-6},
-    "IPE 120": {"W": 53.0e-6},
-    "IPE 140": {"W": 77.3e-6},
-    "IPE 160": {"W": 123.0e-6},
-    "IPE 180": {"W": 166.0e-6},
-    "IPE 200": {"W": 194.0e-6},
-    "IPE 220": {"W": 252.0e-6},
-    "IPE 240": {"W": 324.0e-6},
-    "IPE 300": {"W": 557.0e-6},
+    "IPE 100": {"W": 34.2e-6, "I": 171e-8},
+    "IPE 120": {"W": 53.0e-6, "I": 318e-8},
+    "IPE 140": {"W": 77.3e-6, "I": 541e-8},
+    "IPE 160": {"W": 123.0e-6, "I": 869e-8},
+    "IPE 180": {"W": 166.0e-6, "I": 1320e-8},
+    "IPE 200": {"W": 194.0e-6, "I": 1940e-8},
+    "IPE 220": {"W": 252.0e-6, "I": 2770e-8},
+    "IPE 240": {"W": 324.0e-6, "I": 3890e-8},
+    "IPE 300": {"W": 557.0e-6, "I": 8630e-8},
 }
 
 profil_wahl = st.selectbox("Querschnitt", ["Eigener Querschnitt","IPE 100", "IPE 120", "IPE 140", "IPE 160", "IPE 180", "IPE 200", "IPE 220", "IPE 240", "IPE 300"])
@@ -105,8 +105,10 @@ if profil_wahl == "Eigener Querschnitt":
     with col2:
         h = st.number_input("Höhe h [m]", value=0.1)
     W = (b * h**2) / 6
+    I = (b * h**3) / 12
 else: 
     W = ipe_profile[profil_wahl]["W"]
+    I = ipe_profile[profil_wahl]["I"]
 werkstoffe = {
     "S235": 235e6,
     "S355": 355e6,
@@ -115,8 +117,32 @@ werkstoffe = {
 
 sigma = M_max / W
 Re = werkstoffe[material]
+e_modul = {
+    "S235": 210e9,
+    "S355": 210e9,
+    "Alu":  70e9
+}
+E = e_modul[material]
 S = Re / sigma
 
+if lastfall == "Streckenlast":
+    f_max = (5 * q * L**4) / (384 * E * I)
+elif lastfall == "Einzellast":
+    f_max = (F * L**3) / (48 * E * I)
+elif lastfall == "Einzellast beliebige Position":
+    f_max = (F * a * (L-a) * (L+a)) / (6 * E * I * L)
+elif lastfall == "Kragarm Streckenlast":
+    f_max = (q * L**4) / (8 * E * I)
+elif lastfall == "Kragarm Einzellast":
+    f_max = (F * L**3) / (3 * E * I)
+    
+st.write(f"**Maximale Durchbiegung:** {f_max*1000:.2f} mm")
+
+if f_max < L/300:
+   st.success("✅ Durchbiegung in Ordnung!")
+else:
+   st.error("❌ Durchbiegung zu gross — Profil vergrössern!")
+    
 st.write(f"**Biegespannung:** {sigma/1e6:.2f} MPa")
 st.write(f"**Streckgrenze {material}:** {Re/1e6:.0f} MPa")
 st.write(f"**Sicherheitsfaktor:** {S:.2f}")
