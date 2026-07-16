@@ -149,6 +149,8 @@ elif lastfall == "Kragarm Streckenlast":
     f_max = (q * L**4) / (8 * E * I)
 elif lastfall == "Kragarm Einzellast":
     f_max = (F * L**3) / (3 * E * I)
+elif lastfall == "Kombination Streckenlast + Einzellast Mitte":
+    f_max = (5 * q * L**4) / (384 * E * I)+(F * L**3) / (48 * E * I)
     
 st.write(f"**Maximale Durchbiegung:** {f_max*1000:.2f} mm")
 
