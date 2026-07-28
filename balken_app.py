@@ -109,7 +109,31 @@ ipe_profile = {
     "IPE 300": {"W": 557.0e-6, "I": 8630e-8},
 }
 
-profil_wahl = st.selectbox("Querschnitt", ["Eigener Querschnitt", "Kreisquerschnitt", "IPE 100", "IPE 120", "IPE 140", "IPE 160", "IPE 180", "IPE 200", "IPE 220", "IPE 240", "IPE 300"])
+hea_profile = {
+    "HEA 100": {"W": 72.8e-6, "I": 349e-8},
+    "HEA 120": {"W": 106e-6, "I": 606e-8},
+    "HEA 140": {"W": 155e-6, "I": 1033e-8},
+    "HEA 160": {"W": 220e-6, "I": 1673e-8},
+    "HEA 180": {"W": 294e-6, "I": 2510e-8},
+    "HEA 200": {"W": 389e-6, "I": 3692e-8},
+    "HEA 220": {"W": 515e-6, "I": 5410e-8},
+    "HEA 240": {"W": 675e-6, "I": 7763e-8},
+    "HEA 300": {"W": 1260e-6, "I": 18260e-8},
+}
+
+heb_profile = {
+    "HEB 100": {"W": 90e-6, "I": 450e-8},
+    "HEB 120": {"W": 144e-6, "I": 864e-8},
+    "HEB 140": {"W": 216e-6, "I": 1510e-8},
+    "HEB 160": {"W": 311e-6, "I": 2490e-8},
+    "HEB 180": {"W": 426e-6, "I": 3830e-8},
+    "HEB 200": {"W": 570e-6, "I": 5700e-8},
+    "HEB 220": {"W": 736e-6, "I": 8090e-8},
+    "HEB 240": {"W": 938e-6, "I": 11260e-8},
+    "HEB 300": {"W": 1680e-6, "I": 25170e-8},
+}
+
+profil_wahl = st.selectbox("Querschnitt", ["Eigener Querschnitt", "Kreisquerschnitt"] + list(ipe_profile.keys()) + list(hea_profile.keys()) + list(heb_profile.keys()))
 material = st.selectbox("Material", ["S235", "S355", "Alu"])
 
 if profil_wahl == "Eigener Querschnitt":
@@ -125,10 +149,19 @@ elif profil_wahl == "Kreisquerschnitt":
     d = st.number_input("Durchmesser d [m]", value = 0.05)
     W = (np.pi*d**3)/32
     I = (np.pi*d**4)/64
+    
+elif profil_wahl in hea_profile:
+    W = hea_profile[profil_wahl]["W"]
+    I = hea_profile[profil_wahl]["I"]
+    
+elif profil_wahl in heb_profile:
+    W = heb_profile[profil_wahl]["W"]
+    I = heb_profile[profil_wahl]["I"]
 
 else: 
     W = ipe_profile[profil_wahl]["W"]
     I = ipe_profile[profil_wahl]["I"]
+    
 werkstoffe = {
     "S235": 235e6,
     "S355": 355e6,
