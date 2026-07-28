@@ -109,7 +109,7 @@ ipe_profile = {
     "IPE 300": {"W": 557.0e-6, "I": 8630e-8},
 }
 
-profil_wahl = st.selectbox("Querschnitt", "Kreisquerschnitt", ["Eigener Querschnitt","IPE 100", "IPE 120", "IPE 140", "IPE 160", "IPE 180", "IPE 200", "IPE 220", "IPE 240", "IPE 300"])
+profil_wahl = st.selectbox("Querschnitt", ["Eigener Querschnitt", "Kreisquerschnitt", "IPE 100", "IPE 120", "IPE 140", "IPE 160", "IPE 180", "IPE 200", "IPE 220", "IPE 240", "IPE 300"])
 material = st.selectbox("Material", ["S235", "S355", "Alu"])
 
 if profil_wahl == "Eigener Querschnitt":
