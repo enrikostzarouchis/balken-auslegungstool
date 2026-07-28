@@ -22,7 +22,7 @@ if lastfall == "Streckenlast" or lastfall == "Kragarm Streckenlast":
     a = 0
 elif lastfall == "Einzellast beliebige Position":
     F = st.number_input("Einzellast F [N]", value=50000.0)
-    a = a = st.slider("Position der Last [m]", min_value=0.01, max_value=L-0.01, value=L/2)
+    a = st.slider("Position der Last [m]", min_value=0.01, max_value=L-0.01, value=L/2)
     q = 0
 elif lastfall == "Kombination Streckenlast + Einzellast Mitte":
     q = st.number_input("Streckenlast q [N/m]", value=10000.0)
