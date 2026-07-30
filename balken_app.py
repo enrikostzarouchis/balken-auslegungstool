@@ -75,24 +75,37 @@ heb_profile = {
 werkstoffe = {
     "S235": 235e6,
     "S355": 355e6,
-    "Alu":  270e6
+    "S460": 460e6,
+    "Alu":  270e6,
+    "Edelstahl 1.4301":200e6,
+    "Gusseisen": 250e6,
+    "Holz C24": 24e6
+    
 }
 
 e_modul = {
     "S235": 210e9,
     "S355": 210e9,
-    "Alu":  70e9
+    "S460": 210e9,
+    "Alu":  70e9,
+    "Edelstahl 1.4301":200e9,
+    "Gusseisen": 110e9,
+    "Holz C24": 11e9
 }
 
 dichte = {
     "S235": 7850,
     "S355": 7850,
-    "Alu": 2700
+    "S460": 7850,
+    "Alu": 2700,
+    "Edelstahl 1.4301":8000,
+    "Gusseisen": 7200,
+    "Holz C24": 420
 }
 
 # Selectboxen
 profil_wahl = st.selectbox("Querschnitt", ["Eigener Querschnitt", "Kreisquerschnitt"] + list(ipe_profile.keys()) + list(hea_profile.keys()) + list(heb_profile.keys()))
-material = st.selectbox("Material", ["S235", "S355", "Alu"])
+material = st.selectbox("Material", ["S235", "S355", "S460", "Alu", "Edelstahl 1.4301", "Gusseisen", "Holz C24"])
 
 if profil_wahl == "Eigener Querschnitt":
     col1, col2 = st.columns(2)
