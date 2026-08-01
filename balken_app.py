@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 st.title("🔧 Balken-Auslegungstool")
 
 # Eingabefelder
-lastfall = st.selectbox("Lastfall", ["Streckenlast", "Einzellast", "Kragarm Streckenlast", "Kragarm Einzellast", "Einzellast beliebige Position", "Kombination Streckenlast + Einzellast Mitte", "Streckenlast + Einzellast beliebige Position"])
+lastfall = st.selectbox("Lastfall", ["Streckenlast", "Einzellast", "Kragarm Streckenlast", "Kragarm Einzellast", "Einzellast beliebige Position", "Kombination Streckenlast + Einzellast Mitte", "Streckenlast + Einzellast beliebige Position","Zwei Einzellasten"])
 L = st.number_input("Balkenlänge L [m]", value=5.0)
 
 
@@ -32,6 +32,12 @@ elif lastfall == "Streckenlast + Einzellast beliebige Position":
     q = st.number_input("Streckenlast q [N/m]", value=10000.0)
     F = st.number_input("Einzellast F [N]", value=50000.0)
     a = st.slider("Position der Last [m]", min_value=0.01, max_value=L-0.01, value=L/2)
+elif lastfall == "Zwei Einzellasten":
+    F1 = st.number_input("Einzellast F1 [N]", value=50000.0)
+    F2 = st.number_input("Einzellast F2 [N]", value=50000.0)
+    a1 = st.slider("Position der Last 1 [m]", min_value=0.01, max_value=L-0.01, value=L/2)
+    a2 = st.slider("Position der Last 2 [m]", min_value=0.01, max_value=L-0.01, value=L/2)
+    q = 0
 else:
     F = st.number_input("Einzellast F [N]", value=50000.0)
     q = 0
@@ -202,7 +208,21 @@ elif lastfall == "Streckenlast + Einzellast beliebige Position":
     Q = Q_strecke + Q_einzel
     M_max = np.max(np.abs(M))
     titel = f"Streckenlast + Einzellast beliebige Position (q={q} N/m, F={F} N, L={L} m)"
-
+    
+elif lastfall == "Zwei Einzellasten":
+    R_A = F1*(L - a1)/L + F2*(L - a2)/L
+    R_B = F1*a1/L + F2*a2/L
+    if a1 <= a2:
+      a_klein, F_klein = a1, F1
+      a_gross, F_gross = a2, F2
+    else:
+      a_klein, F_klein = a2, F2
+      a_gross, F_gross = a1, F1
+    M = np.where(x <= a_klein, R_A * x, np.where(x <= a_gross, R_A*x - F_klein*(x - a_klein), R_B*(L - x)))+ (q_eigen * x / 2) * (L - x)
+    Q = np.where(x <= a_klein, R_A, np.where(x <= a_gross, R_A-F_klein, -R_B))+ (q_eigen / 2) * (L - 2 * x)
+    M_max = np.max(np.abs(M))
+    titel = f"Zwei Einzellasten (F1={F1} N bei {a1} m, F2={F2} N bei {a2} m, L={L} m)"
+    
 else:
     M = np.where(x <= L/2, (F/2) * x, (F/2) * (L - x)) + (q_eigen * x / 2) * (L - x)
     Q = np.where(x <= L/2, F/2, -F/2) + (q_eigen / 2) * (L - 2 * x)
@@ -228,6 +248,10 @@ elif lastfall == "Kombination Streckenlast + Einzellast Mitte":
     f_max = (5 * q * L**4) / (384 * E * I) + (F * L**3) / (48 * E * I)
 elif lastfall == "Streckenlast + Einzellast beliebige Position":
     f_max = (F * a * (L-a) * (L+a)) / (6 * E * I * L)+(5 * q * L**4) / (384 * E * I)
+elif lastfall == "Zwei Einzellasten":
+    f_max_F1 = (F1 * a1 * (L-a1) * (L+a1)) / (6 * E * I * L)
+    f_max_F2 = (F2 * a2 * (L-a2) * (L+a2)) / (6 * E * I * L)
+    f_max = f_max_F1 + f_max_F2
 
 # Diagramme
 fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(8, 5))
