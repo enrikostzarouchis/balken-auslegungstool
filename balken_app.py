@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 st.title("🔧 Balken-Auslegungstool")
 
 # Eingabefelder
-lastfall = st.selectbox("Lastfall", ["Streckenlast", "Einzellast", "Kragarm Streckenlast", "Kragarm Einzellast", "Einzellast beliebige Position", "Kombination Streckenlast + Einzellast Mitte", "Streckenlast + Einzellast beliebige Position","Zwei Einzellasten"])
+lastfall = st.selectbox("Lastfall", ["Streckenlast", "Einzellast", "Kragarm Streckenlast", "Kragarm Einzellast", "Einzlelast beliebige Position", "Kombination Streckenlast + Einzellast Mitte", "Streckenlast + Einzellast beliebige Position","Zwei Einzellasten","Kragarm mit Streckenlast + Einzellast am freien Ende"])
 L = st.number_input("Balkenlänge L [m]", value=5.0)
 
 
@@ -38,6 +38,10 @@ elif lastfall == "Zwei Einzellasten":
     a1 = st.slider("Position der Last 1 [m]", min_value=0.01, max_value=L-0.01, value=L/2)
     a2 = st.slider("Position der Last 2 [m]", min_value=0.01, max_value=L-0.01, value=L/2)
     q = 0
+elif lastfall == "Kragarm mit Streckenlast + Einzellast am freien Ende":
+    q = st.number_input("Streckenlast q [N/m]", value=10000.0)
+    F = st.number_input("Einzellast F [N]", value=50000.0)
+    a = 0
 else:
     F = st.number_input("Einzellast F [N]", value=50000.0)
     q = 0
@@ -222,6 +226,16 @@ elif lastfall == "Zwei Einzellasten":
     Q = np.where(x <= a_klein, R_A, np.where(x <= a_gross, R_A-F_klein, -R_B))+ (q_eigen / 2) * (L - 2 * x)
     M_max = np.max(np.abs(M))
     titel = f"Zwei Einzellasten (F1={F1} N bei {a1} m, F2={F2} N bei {a2} m, L={L} m)"
+
+elif lastfall == "Kragarm mit Streckenlast + Einzellast am freien Ende":
+    M_strecke = (q/2) * (L-x)**2 + (q_eigen/2) * (L-x)**2
+    M_einzel = F * (L-x)
+    M = M_strecke + M_einzel
+    Q_strecke = q * (L-x) + q_eigen * (L - x)
+    Q_einzel = np.full(200, F)
+    Q = Q_strecke + Q_einzel
+    M_max = np.max(np.abs(M))
+    titel = f"Kragarm mit Streckenlast + Einzellast am freien Ende (q={q} N/m, F={F} N, L={L} m)"
     
 else:
     M = np.where(x <= L/2, (F/2) * x, (F/2) * (L - x)) + (q_eigen * x / 2) * (L - x)
@@ -252,6 +266,8 @@ elif lastfall == "Zwei Einzellasten":
     f_max_F1 = (F1 * a1 * (L-a1) * (L+a1)) / (6 * E * I * L)
     f_max_F2 = (F2 * a2 * (L-a2) * (L+a2)) / (6 * E * I * L)
     f_max = f_max_F1 + f_max_F2
+elif lastfall == "Kragarm mit Streckenlast + Einzellast am freien Ende":
+    f_max = (q * L**4) / (8 * E * I)+ (F * L**3) / (3 * E * I)
 
 # Diagramme
 fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(8, 5))
